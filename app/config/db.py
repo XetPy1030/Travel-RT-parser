@@ -1,4 +1,5 @@
 from app.config.settings import settings
+from tortoise import Tortoise
 
 
 TORTOISE_ORM = {
@@ -22,3 +23,11 @@ TORTOISE_ORM = {
         },
     },
 }
+
+
+async def init_orm() -> None:
+    await Tortoise.init(config=TORTOISE_ORM)
+
+
+async def close_orm() -> None:
+    await Tortoise.close_connections()
