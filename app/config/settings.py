@@ -54,7 +54,13 @@ class Settings(BaseSettings):
     backend_news_create_path: str = Field(default="/api/news/parser/", description="Django create news path")
     backend_token: str = Field(default="", description="Bearer token for backend sync")
     backend_timeout_seconds: float = Field(default=20.0, description="Timeout for backend API requests")
-    
+
+    # JWT Auth
+    jwt_secret: str = Field(default="change-me-in-production", description="Secret key for JWT signing")
+    jwt_algorithm: str = Field(default="HS256", description="JWT algorithm")
+    jwt_expire_minutes: int = Field(default=60 * 24, description="JWT token lifetime in minutes")
+    auth_password: str = Field(default="", description="Password for /token login (required for auth)")
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
