@@ -51,7 +51,7 @@ class Settings(BaseSettings):
 
     # Django backend sync
     backend_base_url: str = Field(default="http://localhost:8000", description="Django backend base URL")
-    backend_news_create_path: str = Field(default="/api/news/", description="Django create news path")
+    backend_news_create_path: str = Field(default="/api/news/parser/", description="Django create news path")
     backend_token: str = Field(default="", description="Bearer token for backend sync")
     backend_timeout_seconds: float = Field(default=20.0, description="Timeout for backend API requests")
     
