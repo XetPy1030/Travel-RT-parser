@@ -13,6 +13,13 @@ async def main() -> None:
     load_dotenv()
     await init_orm()
     try:
+        # from app.models import News
+        # await News.filter(moderation_status=News.MODERATION_APPROVED).update(needs_backend_update=True)
+        # n = await News.last()
+        # print(n.parsed_title)
+        # n.needs_backend_update = True
+        # await n.save()
+
         once = "--once" in sys.argv[1:]
         service = BackendSyncService(settings=settings)
         while True:

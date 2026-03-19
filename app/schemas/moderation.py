@@ -24,6 +24,7 @@ class NewsRead(BaseModel):
     moderation_comment: str | None
     is_sent_to_backend: bool
     backend_id: int | None
+    needs_backend_update: bool
 
 
 class ModerationActionResult(BaseModel):

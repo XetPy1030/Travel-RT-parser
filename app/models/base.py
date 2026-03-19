@@ -38,6 +38,7 @@ class BaseParsedEntity(Model):
     is_sent_to_backend = fields.BooleanField(default=False, index=True)
     backend_synced_at = fields.DatetimeField(null=True)
     backend_id = fields.IntField(null=True)
+    needs_backend_update = fields.BooleanField(default=False, index=True)
 
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)
