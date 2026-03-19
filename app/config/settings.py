@@ -61,6 +61,17 @@ class Settings(BaseSettings):
     jwt_expire_minutes: int = Field(default=60 * 24, description="JWT token lifetime in minutes")
     auth_password: str = Field(default="", description="Password for /token login (required for auth)")
 
+    # CORS (в env через запятую: CORS_ORIGINS=http://localhost:3000,https://app.example.com)
+    cors_origins: str = Field(
+        default="http://localhost:3000",
+        description="Allowed origins for CORS (comma-separated)",
+    )
+
+    @property
+    def cors_origins_list(self) -> list[str]:
+        """Список origins для CORS (парсится из cors_origins)."""
+        return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"

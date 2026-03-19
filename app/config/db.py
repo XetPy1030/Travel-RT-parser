@@ -26,7 +26,7 @@ TORTOISE_ORM = {
 
 
 async def init_orm() -> None:
-    await Tortoise.init(config=TORTOISE_ORM)
+    await Tortoise.init(config=TORTOISE_ORM, _enable_global_fallback=True)
 
 
 async def close_orm() -> None:
