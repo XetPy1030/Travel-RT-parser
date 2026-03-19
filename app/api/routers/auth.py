@@ -4,25 +4,12 @@ from __future__ import annotations
 import secrets
 
 from fastapi import APIRouter, HTTPException, status
-from pydantic import BaseModel
 
 from app.api.auth import create_access_token
 from app.config.settings import settings
+from app.schemas import TokenRequest, TokenResponse
 
 router = APIRouter(tags=["auth"])
-
-
-class TokenRequest(BaseModel):
-    """Тело запроса: пароль для входа."""
-
-    password: str
-
-
-class TokenResponse(BaseModel):
-    """Ответ: access_token и тип."""
-
-    access_token: str
-    token_type: str = "bearer"
 
 
 def _password_ok(password: str) -> bool:

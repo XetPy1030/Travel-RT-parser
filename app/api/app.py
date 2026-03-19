@@ -9,6 +9,7 @@ from app.api.auth import get_current_user
 from app.api.routers import auth_router, moderation_router
 from app.config.db import close_orm, init_orm
 from app.config.settings import settings
+from app.schemas import HealthResponse
 
 
 @asynccontextmanager
@@ -34,8 +35,8 @@ def create_app() -> FastAPI:
     app.include_router(auth_router)
     app.include_router(moderation_router, dependencies=[Depends(get_current_user)])
 
-    @app.get("/health", tags=["system"])
-    async def healthcheck() -> dict[str, str]:
-        return {"status": "ok"}
+    @app.get("/health", tags=["system"], response_model=HealthResponse)
+    async def healthcheck() -> HealthResponse:
+        return HealthResponse(status="ok")
 
     return app
