@@ -32,7 +32,7 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    router = APIRouter(prefix="/api-moderation", tags=["moderation"])
+    router = APIRouter()
 
     router.include_router(auth_router)
     router.include_router(moderation_router, dependencies=[Depends(get_current_user)])
@@ -41,6 +41,6 @@ def create_app() -> FastAPI:
     async def healthcheck() -> HealthResponse:
         return HealthResponse(status="ok")
 
-    app.include_router(router)
+    app.include_router(router, prefix="/api-moderation", tags=["moderation"])
 
     return app
