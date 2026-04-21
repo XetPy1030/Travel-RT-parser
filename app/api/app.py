@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from contextlib import asynccontextmanager
 
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, APIRouter
 from starlette.middleware.cors import CORSMiddleware
 
 from app.api.auth import get_current_user
@@ -32,11 +32,15 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    app.include_router(auth_router)
-    app.include_router(moderation_router, dependencies=[Depends(get_current_user)])
+    router = APIRouter(prefix="/api-moderation", tags=["moderation"])
 
-    @app.get("/health", tags=["system"], response_model=HealthResponse)
+    router.include_router(auth_router)
+    router.include_router(moderation_router, dependencies=[Depends(get_current_user)])
+
+    @router.get("/health", tags=["system"], response_model=HealthResponse)
     async def healthcheck() -> HealthResponse:
         return HealthResponse(status="ok")
+
+    app.include_router(router)
 
     return app
