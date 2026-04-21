@@ -1,0 +1,129 @@
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: travel-parser-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # - ./init_db.sql:/docker-entrypoint-initdb.d/init_db.sql:ro
+    networks:
+      - travel-rt-network
+    ports:
+      - 5644:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  migrate:
+    build:
+      context: .
+    container_name: travel-parser-migrate
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+    networks:
+      - travel-rt-network
+    command: >
+      sh -c "tortoise migrate"
+
+  parser:
+    build:
+      context: .
+    container_name: travel-parser-main
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+    networks:
+      - travel-rt-network
+    command: ["python", "main.py"]
+
+  sender:
+    build:
+      context: .
+    container_name: travel-parser-sender
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+    networks:
+      - travel-rt-network
+    command: ["python", "sender.py"]
+
+  server:
+    build:
+      context: .
+    container_name: travel-parser-server
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+    networks:
+      - travel-rt-network
+    ports:
+      - "9000:9000"
+    command: ["python", "server.py"]
+
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: travel-parser-redis-dev
+  #   restart: unless-stopped
+  #   command: redis-server --appendonly yes
+  #   volumes:
+  #     - redis_data:/data
+  #   networks:
+  #     - travel-parser-network
+  #   ports:
+  #     - "${REDIS_PORT:-6379}:6379"
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "ping"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 3
+  #     start_period: 10s
+
+volumes:
+  postgres_data:
+    driver: local
+  # redis_data:
+  #   driver: local
+
+networks:
+  travel-rt-network:
+    name: travel-rt-network
+    driver: bridge
+    external: true
