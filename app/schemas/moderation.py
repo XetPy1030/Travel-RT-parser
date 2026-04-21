@@ -33,3 +33,10 @@ class ModerationActionResult(BaseModel):
     status: Literal["ok"] = "ok"
     news_id: int
     moderation_status: str
+
+
+class ModerationApproveAllResult(BaseModel):
+    """Ответ на массовое одобрение новостей в статусе «на модерации»."""
+
+    status: Literal["ok"] = "ok"
+    approved_count: int
